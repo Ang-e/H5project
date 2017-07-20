@@ -15,6 +15,8 @@ game = {
     cWidth: 0,
     cHeight: 0,
     bgPic:new Image(),
+    startTime: Date.now(),
+    deltaTime: 0,
     /**
      * 初始化变量
      */
@@ -27,9 +29,9 @@ game = {
         this.cxt2 = can2.getContext('2d');
         this.bgPic.src = './images/background.jpg';
         this.bgPic.onload = () => {
-            this.gloop();
             this.ane.init();
             this.fruit.init();
+            this.gloop();
         }
     },
     /**
@@ -40,6 +42,8 @@ game = {
         game.drawBg();
         game.ane.darw();
         game.fruit.draw();
+        this.deltaTime = Date.now() - this.startTime;
+        this.startTime = Date.now();
         window.requestAnimFrame(game.gloop);
     },
     /**
@@ -91,31 +95,30 @@ game = {
     // 果实
     fruit: {
         /**
-         * @parmas {Array}  alive 果实状态数组 [false|true]
-         * @parmas {Number} num 果实数量 默认 30
-         * @parmas {Array}  x 果实x坐标数组 
-         * @parmas {Array} y 果实y坐标数组 
+         * @parmas {Number} num 果实数量 默认 30  
          * @parmas {image} orange 成熟果实
          * @parmas {image} blue 绿色果实
          */
-        alive: [],
-        x: [],
-        y: [],
-        num: 30,
+        arr: [
+        // {
+        //    x: '', x坐标 默认 0
+        //    y: '', y坐标 默认 0 
+        //    l:  半径默认 0
+        //    img: 图片 
+        // }
+        ],
+        num: 10,
         orange: new Image(),
         blue: new Image(),
         /**
          * 初始化数据
          */
         init: function() {
-            for(var i = 0 ; i < this.num; i ++) {
-                this.alive[i] = false;
-                this.x[i] = 0;
-                this.y[i] = 0;
-                this.find(i);
-            }
             this.orange.src = './images/fruit.png';
             this.blue.src = './images/blue.png';
+            for(var i = 0 ; i < this.num; i ++) {
+                this.add(i);
+            }
         },
         /**
          * 绘制果实
@@ -123,12 +126,41 @@ game = {
          */
         draw: function() {
             let context = game.cxt2;
-            for (var index = 0; index < this.num; index++) {
-                let fruit = Math.random() > 0.5 ? this.orange : this.blue;
-                context.drawImage(fruit, 
-                    this.x[index] - fruit.width * 0.5, 
-                    this.y[index] - fruit.height * 0.5 );
+            for (var index = 0; index < this.arr.length; index++) {
+                let fruit = this.arr[index];
+                if(fruit.l < this.orange.height) {
+                    fruit.l += game.deltaTime *  fruit.speed;
+                } else {
+                    fruit.y -= game.deltaTime * fruit.speed * 4;  
+                }
+                context.drawImage(fruit.img, 
+                    fruit.x - fruit.l * 0.5, 
+                    fruit.y - fruit.l * 0.5,
+                    fruit.l,
+                    fruit.l
+                );
+                /**
+                 * 判断边界 超出边界删除，然后在添加一个
+                 */
+                if(fruit.y < 10) {
+                    this.arr.splice(index, 1);
+                    this.add(this.arr.length);
+                }
             }
+        },
+        /**
+         * 添加果实
+         */
+        add: function(i) {
+            let obj = {
+                    x: 0,
+                    y: 0,
+                    l: 0,
+                    img: Math.random() < 0.3 ? this.blue : this.orange,
+                    speed: Math.random() * 0.06 + 0.01,  // [0.01, 0.07)
+                }
+            this.arr.push(obj);
+            this.find(i);
         },
         /**
          * 设置 果实的x , y 坐标 
@@ -137,8 +169,8 @@ game = {
          */
         find: function(i) {
             let aneId = Math.floor(Math.random() * game.ane.num);
-            this.x[i] = game.ane.x[aneId];
-            this.y[i] = game.cHeight - game.ane.len[aneId];
+            this.arr[i].x = game.ane.x[aneId];
+            this.arr[i].y = game.cHeight - game.ane.len[aneId];
         }
     }
 }
