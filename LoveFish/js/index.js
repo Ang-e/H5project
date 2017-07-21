@@ -278,17 +278,25 @@ game = {
         x: 0,
         y: 0,
         angle: 0,
-        body: new Image(),
+        bodyArr:[],
+        bodyTimer: 0,
+        bodyIndex: 0,
+
         tailArr: [],
         tailIndex: 0,
+
         eyeArr: [],
         eyeTimer: 1000,
         eyeIndex: 0,
         timer: 0,
+
         init: function() {
             this.x = game.cWidth / 2;
             this.y = game.cHeight / 2;
-            this.body.src = './images/babyFade0.png';
+            for (var i = 0; i < 20; i++) {
+                this.bodyArr[i] = new Image();
+                this.bodyArr[i].src = './images/babyFade' + i + '.png';
+            }
             for (var i = 0 ; i < 8 ; i ++ ) {
                 this.tailArr[i] = new Image();
                 this.tailArr[i].src = './images/babyTail' + i + '.png';
@@ -324,12 +332,24 @@ game = {
                     this.eyeTimer = 3000 + Math.random() * 1500;
                 }
             }
+            // 身体变色
+            this.bodyTimer += game.deltaTime;
+            if(this.bodyTimer > 300) {
+                this.bodyTimer = 0;
+                this.bodyIndex +=1;
+                if(this.bodyIndex > 19) {
+                    this.bodyIndex = 0;
+                    console.log('game over')
+                }
+            }
+
             context.save();
             context.translate(this.x, this.y);
             context.rotate(this.angle);
             let tail = this.tailArr[this.tailIndex];
             context.drawImage(tail, -tail.width / 2 + 23, -tail.height / 2);
-            context.drawImage(this.body, -this.body.width / 2, -this.body.height / 2);
+            let body = this.bodyArr[this.bodyIndex];
+            context.drawImage(body, -body.width / 2, -body.height / 2);
             let eye = this.eyeArr[this.eyeIndex];
             context.drawImage(eye, -eye.width / 2, -eye.height / 2);
             context.restore();
