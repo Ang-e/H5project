@@ -210,19 +210,25 @@ game = {
         x: 0,
         y: 0,
         angle: 0,
-        eye: new Image(),
         body: new Image(),
         tailArr: [],
         tailIndex: 0,
+        eyeArr: [],
+        eyeTimer: 1000,
+        eyeIndex: 0,
+        timer:0,
         init: function() {
             this.x = game.cWidth / 2 -50;
             this.y = game.cHeight / 2;
-            this.eye.src = './images/bigEye0.png';
             this.body.src = './images/bigSwim0.png';
             for (var i = 0 ; i < 8 ; i ++ ) {
                 this.tailArr[i] = new Image();
                 this.tailArr[i].src = './images/bigTail' + i + '.png';
             } 
+            for (var i = 0 ; i < 2; i ++) {
+                this.eyeArr[i] = new Image();
+                this.eyeArr[i].src = './images/bigEye' + i + '.png';
+            }
         },
         draw: function() {
             let context = game.cxt1;
@@ -237,12 +243,26 @@ game = {
             // 尾巴切换每次加1 %8
             this.tailIndex = (this.tailIndex + 1) % 8;
 
+            // 眨眼
+            this.timer += game.deltaTime;
+            if (this.timer > this.eyeTimer) {
+                this.timer = 0;
+                this.eyeIndex = (this.eyeIndex + 1) % 2;
+                if( this.eyeIndex === 1) {
+                    this.eyeTimer = 200;
+                } else {
+                    this.eyeTimer = 3000 + Math.random() * 1500;
+                }
+            }
+
             context.save();
             context.translate(this.x, this.y);
             context.rotate(this.angle);
-            context.drawImage(this.tailArr[this.tailIndex], - this.tailArr[this.tailIndex].width / 2 + 23, -this.tailArr[this.tailIndex].height / 2);
+            let tail = this.tailArr[this.tailIndex];
+            context.drawImage(tail, -tail.width / 2 + 23, -tail.height / 2);
             context.drawImage(this.body, -this.body.width / 2, -this.body.height / 2);
-            context.drawImage(this.eye, -this.eye.width / 2, -this.eye.height / 2);
+            let eye = this.eyeArr[this.eyeIndex];
+            context.drawImage(eye, -eye.width / 2, -eye.height / 2);
             context.restore();
         }
     },
@@ -258,18 +278,24 @@ game = {
         x: 0,
         y: 0,
         angle: 0,
-        eye: new Image(),
         body: new Image(),
         tailArr: [],
         tailIndex: 0,
+        eyeArr: [],
+        eyeTimer: 1000,
+        eyeIndex: 0,
+        timer: 0,
         init: function() {
             this.x = game.cWidth / 2;
             this.y = game.cHeight / 2;
-            this.eye.src = './images/babyEye0.png';
             this.body.src = './images/babyFade0.png';
             for (var i = 0 ; i < 8 ; i ++ ) {
                 this.tailArr[i] = new Image();
                 this.tailArr[i].src = './images/babyTail' + i + '.png';
+            }
+            for (var i = 0 ; i < 2; i ++) {
+                this.eyeArr[i] = new Image();
+                this.eyeArr[i].src = './images/babyEye' + i + '.png';
             }
         },
         draw: function() {
@@ -277,20 +303,35 @@ game = {
             // 小鱼坐标变换
             this.x = lerpDistance(game.mom.x, this.x, 0.97);
             this.y = lerpDistance(game.mom.y, this.y, 0.97);
+
             // 小鱼旋转变
             let deltaY = game.mom.y - this.y;
             let deltaX = game.mom.x - this.x;
             let beta = Math.atan2(deltaY,deltaX) + Math.PI; // 2π-0;
             this.angle = lerpAngle(beta, this.angle, 0.6);
+
             // 尾巴切换每次加1 %8
             this.tailIndex = (this.tailIndex + 1) % 8;
 
+            // 眨眼
+            this.timer  += game.deltaTime;
+            if (this.timer > this.eyeTimer) {
+                this.timer = 0;
+                this.eyeIndex = (this.eyeIndex + 1) % 2;
+                if( this.eyeIndex === 1) {
+                    this.eyeTimer = 200;
+                } else {
+                    this.eyeTimer = 3000 + Math.random() * 1500;
+                }
+            }
             context.save();
             context.translate(this.x, this.y);
             context.rotate(this.angle);
-            context.drawImage(this.tailArr[this.tailIndex], -this.tailArr[this.tailIndex].width / 2 + 23, -this.tailArr[this.tailIndex].height / 2);
+            let tail = this.tailArr[this.tailIndex];
+            context.drawImage(tail, -tail.width / 2 + 23, -tail.height / 2);
             context.drawImage(this.body, -this.body.width / 2, -this.body.height / 2);
-            context.drawImage(this.eye, -this.eye.width / 2, -this.eye.height / 2);
+            let eye = this.eyeArr[this.eyeIndex];
+            context.drawImage(eye, -eye.width / 2, -eye.height / 2);
             context.restore();
         }
     },
@@ -299,7 +340,6 @@ game = {
         let arr = this.fruit.arr;
         for (var i = 0; i < arr.length; i++) {
             let col = calLength2(arr[i].x, arr[i].y, this.mom.x, this.mom.y);
-            console.log(col);
             if (col < 900) {
                 this.fruit.dead(i);
             }
