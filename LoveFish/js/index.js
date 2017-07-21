@@ -205,19 +205,24 @@ game = {
          * @params {number} y y坐标
          * @params angle 旋转角度
          * eye 眼睛 body 身体 tail 尾巴
+         * @params tailArr 尾巴图片数组【0】 tailIndex 当前尾巴下标 0
          */
         x: 0,
         y: 0,
         angle: 0,
         eye: new Image(),
         body: new Image(),
-        tail: new Image(),
+        tailArr: [],
+        tailIndex: 0,
         init: function() {
             this.x = game.cWidth / 2 -50;
             this.y = game.cHeight / 2;
             this.eye.src = './images/bigEye0.png';
             this.body.src = './images/bigSwim0.png';
-            this.tail.src = './images/bigTail0.png'; 
+            for (var i = 0 ; i < 8 ; i ++ ) {
+                this.tailArr[i] = new Image();
+                this.tailArr[i].src = './images/bigTail' + i + '.png';
+            } 
         },
         draw: function() {
             let context = game.cxt1;
@@ -229,11 +234,13 @@ game = {
             let deltaX = game.mx - this.x;
             let beta = Math.atan2(deltaY,deltaX) + Math.PI; // 2π-0;
             this.angle = lerpAngle(beta, this.angle, 0.6);
+            // 尾巴切换每次加1 %8
+            this.tailIndex = (this.tailIndex + 1) % 8;
 
             context.save();
             context.translate(this.x, this.y);
             context.rotate(this.angle);
-            context.drawImage(this.tail, -this.tail.width / 2 + 23, -this.tail.height / 2);
+            context.drawImage(this.tailArr[this.tailIndex], - this.tailArr[this.tailIndex].width / 2 + 23, -this.tailArr[this.tailIndex].height / 2);
             context.drawImage(this.body, -this.body.width / 2, -this.body.height / 2);
             context.drawImage(this.eye, -this.eye.width / 2, -this.eye.height / 2);
             context.restore();
@@ -246,19 +253,24 @@ game = {
          * @params {number} y y坐标
          * @params angle 旋转角度
          * eye 眼睛 body 身体 tail 尾巴
+         * @params tailArr 尾巴图片数组【0】 tailIndex 当前尾巴下标 0
          */
         x: 0,
         y: 0,
         angle: 0,
         eye: new Image(),
         body: new Image(),
-        tail: new Image(),
+        tailArr: [],
+        tailIndex: 0,
         init: function() {
             this.x = game.cWidth / 2;
             this.y = game.cHeight / 2;
             this.eye.src = './images/babyEye0.png';
             this.body.src = './images/babyFade0.png';
-            this.tail.src = './images/babyTail0.png'; 
+            for (var i = 0 ; i < 8 ; i ++ ) {
+                this.tailArr[i] = new Image();
+                this.tailArr[i].src = './images/babyTail' + i + '.png';
+            }
         },
         draw: function() {
             let context = game.cxt1;
@@ -270,11 +282,13 @@ game = {
             let deltaX = game.mom.x - this.x;
             let beta = Math.atan2(deltaY,deltaX) + Math.PI; // 2π-0;
             this.angle = lerpAngle(beta, this.angle, 0.6);
+            // 尾巴切换每次加1 %8
+            this.tailIndex = (this.tailIndex + 1) % 8;
 
             context.save();
             context.translate(this.x, this.y);
             context.rotate(this.angle);
-            context.drawImage(this.tail, -this.tail.width / 2 + 30, -this.tail.height / 2);
+            context.drawImage(this.tailArr[this.tailIndex], -this.tailArr[this.tailIndex].width / 2 + 23, -this.tailArr[this.tailIndex].height / 2);
             context.drawImage(this.body, -this.body.width / 2, -this.body.height / 2);
             context.drawImage(this.eye, -this.eye.width / 2, -this.eye.height / 2);
             context.restore();
