@@ -68,6 +68,7 @@ game = {
         game.momBabyCol();
         game.mom.draw();
         game.baby.draw();
+        game.wave.draw();
         game.data.draw();
         window.requestAnimFrame(game.gloop);
     },
@@ -185,7 +186,7 @@ game = {
                     y: 0,
                     l: 0,
                     imgType: Math.random() < 0.3 ? 'blue' : 'orange',
-                    speed: Math.random() * 0.01 + 0.01,  // [0.01, 0.07)
+                    speed: Math.random() * 0.003 + 0.005,  // [0.01, 0.07)
                 }
             this.arr.push(obj);
             this.find(i);
@@ -361,7 +362,7 @@ game = {
                 }
             }
             // 身体变色
-            this.bodyTimer += game.deltaTime;
+            this.bodyTimer += game.deltaTime * 0.1;
             if(this.bodyTimer > 300) {
                 this.bodyTimer = 0;
                 this.bodyIndex +=1;
@@ -385,6 +386,42 @@ game = {
             context.restore();
         }
     },
+    wave: {
+        arr:[],
+        draw: function () {
+            let context = game.cxt1;
+            context.save();
+            context.lineWidth=2;
+            context.shadowBlur = 10;
+            context.shadowColor = '#fff';
+            for(var i = 0, len = this.arr.length; i < len; i++){
+                let arc = this.arr[i];
+                arc.r += game.deltaTime * 0.01;
+                let alpha = 1 -arc.r / 50; 
+                if( arc.r > 50 ) {
+                    this.delete(i);
+                    break;
+                }
+                context.beginPath();
+                context.strokeStyle="rgba(255,255,255," +alpha+ ")";
+                context.arc(arc.x, arc.y, arc.r, Math.PI * 2,false);
+                context.stroke();
+                context.closePath();
+            }
+            context.restore();
+        },
+        add: function(x, y) {
+            obj = {
+                x: x,
+                y: y,
+                r: 20
+            }
+            this.arr.push(obj);
+        },
+        delete: function(i) {
+            this.arr.splice(i, 1);
+        }
+    },
     // 大鱼和果实之间的碰撞检测
     momFruitCol: function() {
         if (this.data.gameOver) {
@@ -406,6 +443,7 @@ game = {
                 } else {
                     this.data.double = 1;
                 }
+                game.wave.add(arr[i].x, arr[i].y)
                 this.fruit.dead(i);
             }
         }
@@ -420,6 +458,7 @@ game = {
             game.data.addScore();
         }
     },
+    // 分数相关
     data: {
         fruitNum: 0,
         double: 1,
