@@ -86,32 +86,43 @@ game = {
          * @parmas {Array} len 海葵长度数组
          * @parmas {Number} num 海葵数量
          */
-        x: [],
-        len: [],
+        arr:[],
         num: 50,
+        angle:0,
         /**
          * 初始化各个海葵的位置和长度
          */
         init: function(){
+            let h = game.cHeight;
             for (var index = 0; index < this.num; index++) {
-                this.x[index] = index * 16 + Math.random() * 10;
-                this.len[index] = 200 + Math.random() * 50;
+                let rootx = index * 16 + Math.random() * 10
+                let obj = {
+                    rootx: rootx,
+                    headx: rootx,
+                    heady: h - 250 + Math.random() * 50,
+                    amp: 50 + Math.random() * 50
+                }
+                this.arr.push(obj);
             }
         },
         /**
          * 绘制海葵
          */
         darw: function() {
+            this.angle += game.deltaTime * 0.0002;
+            let l = Math.sin(this.angle);
             let context = game.cxt2;
             context.save(); 
             context.globalAlpha=0.6;
             context.lineWidth="20";
             context.strokeStyle='#3b154e';
             context.lineCap='round';
+            let cHeight = game.cHeight;
             for (var index = 0; index < this.num; index++) {
+                let ane = this.arr[index];
                 context.beginPath();
-                context.moveTo(this.x[index], game.cHeight);
-                context.lineTo(this.x[index], game.cHeight - this.len[index]);
+                context.moveTo(ane.rootx, cHeight);
+                context.quadraticCurveTo(ane.rootx, cHeight - 150, ane.headx + l * ane.amp, ane.heady);
                 context.stroke();
             }
             context.restore();
@@ -198,8 +209,8 @@ game = {
          */
         find: function(i) {
             let aneId = Math.floor(Math.random() * game.ane.num);
-            this.arr[i].x = game.ane.x[aneId];
-            this.arr[i].y = game.cHeight - game.ane.len[aneId];
+            this.arr[i].x = game.ane.arr[aneId].rootx;
+            this.arr[i].y = game.ane.arr[aneId].heady;
         },
         /**
          * 消除 数组下标
