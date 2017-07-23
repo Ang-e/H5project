@@ -46,6 +46,9 @@ game = {
     },
     // 获取画布鼠标移动监测
     mouseMove: function(event) {
+        if (game.data.gameOver) {
+            return ;
+        }
         game.mx = event.offSetX || event.layerX;
         game.my = event.offSetY || event.layerY;
     },
@@ -61,9 +64,11 @@ game = {
         this.startTime = Date.now();
 
         game.cxt1.clearRect(0, 0, game.cWidth, game.cHeight);
+        game.momFruitCol();
+        game.momBabyCol();
         game.mom.draw();
         game.baby.draw();
-        game.momFruitCol();
+        game.data.draw();
         window.requestAnimFrame(game.gloop);
     },
     /**
@@ -152,6 +157,11 @@ game = {
                 } else {
                     fruit.y -= game.deltaTime * fruit.speed * 3;  
                 }
+                if(fruit.imgType == 'blue') {
+                    fruit['img'] = this.blue;
+                } else {
+                    fruit['img'] = this.orange;
+                }
                 context.drawImage(fruit.img, 
                     fruit.x - fruit.l * 0.5, 
                     fruit.y - fruit.l * 0.5,
@@ -174,8 +184,8 @@ game = {
                     x: 0,
                     y: 0,
                     l: 0,
-                    img: Math.random() < 0.3 ? this.blue : this.orange,
-                    speed: Math.random() * 0.04 + 0.01,  // [0.01, 0.07)
+                    imgType: Math.random() < 0.3 ? 'blue' : 'orange',
+                    speed: Math.random() * 0.01 + 0.01,  // [0.01, 0.07)
                 }
             this.arr.push(obj);
             this.find(i);
@@ -210,20 +220,29 @@ game = {
         x: 0,
         y: 0,
         angle: 0,
-        body: new Image(),
+
         tailArr: [],
         tailIndex: 0,
+
         eyeArr: [],
         eyeTimer: 1000,
         eyeIndex: 0,
         timer:0,
+
+        bodyBlue:[],
+        bodyOrange:[],
+        bodyIndex:0,
+
         init: function() {
             this.x = game.cWidth / 2 -50;
             this.y = game.cHeight / 2;
-            this.body.src = './images/bigSwim0.png';
             for (var i = 0 ; i < 8 ; i ++ ) {
                 this.tailArr[i] = new Image();
                 this.tailArr[i].src = './images/bigTail' + i + '.png';
+                this.bodyBlue[i] = new Image();
+                this.bodyBlue[i].src = './images/bigSwimBlue' + i + '.png';
+                this.bodyOrange[i] = new Image();
+                this.bodyOrange[i].src = './images/bigSwim' + i + '.png';
             } 
             for (var i = 0 ; i < 2; i ++) {
                 this.eyeArr[i] = new Image();
@@ -258,9 +277,18 @@ game = {
             context.save();
             context.translate(this.x, this.y);
             context.rotate(this.angle);
+
             let tail = this.tailArr[this.tailIndex];
             context.drawImage(tail, -tail.width / 2 + 23, -tail.height / 2);
-            context.drawImage(this.body, -this.body.width / 2, -this.body.height / 2);
+            let body;
+
+            if(game.data.double == 2) {
+                body = this.bodyBlue[this.bodyIndex]; 
+            } else {
+                body = this.bodyOrange[this.bodyIndex];
+            }
+            context.drawImage(body, -body.width / 2, -body.height / 2);
+
             let eye = this.eyeArr[this.eyeIndex];
             context.drawImage(eye, -eye.width / 2, -eye.height / 2);
             context.restore();
@@ -338,8 +366,10 @@ game = {
                 this.bodyTimer = 0;
                 this.bodyIndex +=1;
                 if(this.bodyIndex > 19) {
-                    this.bodyIndex = 0;
-                    console.log('game over')
+                    this.bodyIndex = 19;
+                    game.data.gameOver = true;
+                    game.mx = game.cWidth / 2;
+                    game.my = game.cHeight / 2;
                 }
             }
 
@@ -357,12 +387,78 @@ game = {
     },
     // 大鱼和果实之间的碰撞检测
     momFruitCol: function() {
+        if (this.data.gameOver) {
+            return;
+        }
         let arr = this.fruit.arr;
         for (var i = 0; i < arr.length; i++) {
             let col = calLength2(arr[i].x, arr[i].y, this.mom.x, this.mom.y);
             if (col < 900) {
+                this.data.fruitNum ++;
+                this.mom.bodyIndex ++;
+
+                if(this.mom.bodyIndex > 7) {
+                    this.mom.bodyIndex =7
+                }
+
+                if(arr[i].imgType == 'blue') {
+                    this.data.double = 2;
+                } else {
+                    this.data.double = 1;
+                }
                 this.fruit.dead(i);
             }
+        }
+    },
+    // 大鱼和小鱼的碰撞
+    momBabyCol: function() {
+        if (this.data.gameOver || !this.data.fruitNum) {
+            return;
+        }
+        let col = calLength2(this.mom.x, this.mom.y, this.baby.x, this.baby.y);
+        if(col< 900) {
+            game.data.addScore();
+        }
+    },
+    data: {
+        fruitNum: 0,
+        double: 1,
+        score: 0,
+        gameOver: false,
+        globalAlpha: 0,
+        draw: function() {
+            let x = game.cWidth / 2;
+            let y = game.cHeight;
+            let context = game.cxt1;
+            context.save();
+            context.fillStyle='#fff';
+            // context.fillText('num:' + this.fruitNum, x, y);
+            // context.fillText('double:' + this.double, x, y + 30);
+            context.font='20px sans-serif';
+            context.textAlign='center';
+            context.shadowBlur=10;
+            context.shadowColor='#fff';
+            context.globalAlpha = 1;
+            context.fillText('score: ' + this.score, x, y - 30);
+            if(this.gameOver) {
+                this.globalAlpha += game.deltaTime * 0.0001;
+                if (this.globalAlpha > 1) {
+                    this.globalAlpha = 1;
+                }
+                // console.log(this.globalAlpha);
+                context.fillStyle='#f60';
+                context.font='40px sans-serif';
+                context.globalAlpha = this.globalAlpha;
+                context.fillText('GAME OVER', x, game.cHeight / 2);
+            }
+            context.restore();
+        },
+        addScore: function() {
+            game.baby.bodyIndex = 0;
+            game.mom.bodyIndex = 0;
+            this.double = 1;
+            this.score += this.fruitNum * 100;
+            this.fruitNum = 0;
         }
     }
 }
