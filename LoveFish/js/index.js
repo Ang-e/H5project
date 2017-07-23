@@ -393,28 +393,31 @@ game = {
             context.save();
             context.lineWidth=2;
             context.shadowBlur = 10;
-            context.shadowColor = '#fff';
             for(var i = 0, len = this.arr.length; i < len; i++){
                 let arc = this.arr[i];
                 arc.r += game.deltaTime * 0.01;
-                let alpha = 1 -arc.r / 50; 
-                if( arc.r > 50 ) {
+                let alpha = 1 -arc.r / arc.maxR; 
+                if( arc.r > arc.maxR ) {
                     this.delete(i);
                     break;
                 }
                 context.beginPath();
-                context.strokeStyle="rgba(255,255,255," +alpha+ ")";
+                context.strokeStyle = arc.color;
+                context.shadowColor = arc.color;
+                context.globalAlpha = alpha;
                 context.arc(arc.x, arc.y, arc.r, Math.PI * 2,false);
                 context.stroke();
                 context.closePath();
             }
             context.restore();
         },
-        add: function(x, y) {
+        add: function(x, y, color, maxR) {
             obj = {
                 x: x,
                 y: y,
-                r: 20
+                r: 20,
+                color: color,
+                maxR: maxR,
             }
             this.arr.push(obj);
         },
@@ -443,7 +446,7 @@ game = {
                 } else {
                     this.data.double = 1;
                 }
-                game.wave.add(arr[i].x, arr[i].y)
+                game.wave.add(arr[i].x, arr[i].y,"#fff",50);
                 this.fruit.dead(i);
             }
         }
@@ -455,7 +458,8 @@ game = {
         }
         let col = calLength2(this.mom.x, this.mom.y, this.baby.x, this.baby.y);
         if(col< 900) {
-            game.data.addScore();
+            this.wave.add(this.baby.x,this.baby.y,"#f60",100);
+            this.data.addScore();
         }
     },
     // 分数相关
