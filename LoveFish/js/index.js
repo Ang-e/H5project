@@ -122,7 +122,8 @@ game = {
                 let ane = this.arr[index];
                 context.beginPath();
                 context.moveTo(ane.rootx, cHeight);
-                context.quadraticCurveTo(ane.rootx, cHeight - 150, ane.headx + l * ane.amp, ane.heady);
+                ane['hx'] = ane.headx + l * ane.amp;
+                context.quadraticCurveTo(ane.rootx, cHeight - 150, ane.hx, ane.heady);
                 context.stroke();
             }
             context.restore();
@@ -165,6 +166,7 @@ game = {
             for (var index = 0; index < this.arr.length; index++) {
                 let fruit = this.arr[index];
                 if(fruit.l < this.orange.height) {
+                    fruit.x = game.ane.arr[fruit.aneId].hx;
                     fruit.l += game.deltaTime *  fruit.speed;
                 } else {
                     fruit.y -= game.deltaTime * fruit.speed * 3;  
@@ -209,6 +211,7 @@ game = {
          */
         find: function(i) {
             let aneId = Math.floor(Math.random() * game.ane.num);
+            this.arr[i]['aneId'] = aneId;
             this.arr[i].x = game.ane.arr[aneId].rootx;
             this.arr[i].y = game.ane.arr[aneId].heady;
         },
