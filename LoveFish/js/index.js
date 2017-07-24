@@ -41,6 +41,7 @@ game = {
             this.fruit.init();
             this.mom.init();
             this.baby.init();
+            this.floater.init();
             this.gloop();
         }
     },
@@ -66,6 +67,7 @@ game = {
         game.cxt1.clearRect(0, 0, game.cWidth, game.cHeight);
         game.momFruitCol();
         game.momBabyCol();
+        game.floater.draw();
         game.mom.draw();
         game.baby.draw();
         game.wave.draw();
@@ -400,6 +402,7 @@ game = {
             context.restore();
         }
     },
+    // 特效 圆圈
     wave: {
         arr:[],
         draw: function () {
@@ -463,6 +466,44 @@ game = {
                 game.wave.add(arr[i].x, arr[i].y,"#fff",50);
                 this.fruit.dead(i);
             }
+        }
+    },
+    floater: {
+        arr: [],
+        num: 30,
+        angle: 0,
+        picArr: [],
+        init: function() {
+            let picArr = this.picArr;
+            for(var i = 0 ; i < 7 ; i ++) {
+                picArr[i] = new Image();
+                picArr[i].src = './images/dust' + i + '.png';
+            }
+            let num = this.num;
+            let cWidth = game.cWidth;
+            let cHeight = game.cHeight;
+            let arr = this.arr;
+            for(var i = 0 ; i < num ; i ++ ) {
+                let obj = {
+                    x: Math.random() * cWidth,
+                    y: Math.random() * cHeight,
+                    amp: Math.random() * 25 + 20,
+                    img: picArr[Math.floor(Math.random() * 7)]
+                };
+                arr.push(obj);
+            }
+        },
+        draw: function() {
+            this.angle += game.deltaTime * 0.0002;
+            let l = Math.sin(this.angle);
+            let context = game.cxt1;
+            let num = this.num;
+            context.save();
+            for(var i = 0; i < num; i ++ ) {
+                let obj =  this.arr[i];
+                context.drawImage(obj.img, obj.x + l * obj.amp, obj.y);
+            }
+            context.restore();
         }
     },
     // 大鱼和小鱼的碰撞
