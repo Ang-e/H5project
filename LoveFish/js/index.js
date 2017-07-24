@@ -34,13 +34,14 @@ game = {
         can1.addEventListener('mousemove',this.mouseMove,false)
 
         this.bgPic.src = './images/background.jpg';
-        this.bgPic.onload = () => {
-            this.ane.init();
-            this.fruit.init();
-            this.mom.init();
-            this.baby.init();
-            this.floater.init();
-            this.gloop();
+        var that = this;
+        this.bgPic.onload = function() {
+            that.ane.init();
+            that.fruit.init();
+            that.mom.init();
+            that.baby.init();
+            that.floater.init();
+            that.gloop();
         }
     },
     // 获取画布鼠标移动监测 （如果 game 已经结束 mx my 将不在更新）
@@ -58,7 +59,7 @@ game = {
         // 更新 deltaTime 
         this.deltaTime = Date.now() - this.startTime;
         this.startTime = Date.now();
-        this.deltaTime = Math.min(this.deltaTime, 20);
+        this.deltaTime = Math.min(16, 20);
         // 画布2
         game.cxt2.clearRect(0, 0, game.cWidth, game.cHeight);
         game.drawBg();
