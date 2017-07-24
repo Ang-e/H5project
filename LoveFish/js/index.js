@@ -1,7 +1,3 @@
-window.onload = function() {
-    game.init();
-}
-
 game = {
     /**
      * cxt1 画布1在上 大鱼 小鱼 特效 浮动物品
@@ -30,7 +26,7 @@ game = {
         var can2 = document.getElementById('canvasTwo');
         this.cWidth = can1.offsetWidth;
         this.cHeight = can1.offsetHeight;
-        this.mx = this.cWidth / 2;
+        this.mx = this.cWidth / 2 - 30;
         this.my = this.cHeight / 2;
         this.cxt1 = can1.getContext('2d');
         this.cxt2 = can2.getContext('2d');
@@ -249,7 +245,7 @@ game = {
          */
         x: 0,
         y: 0,
-        angle: 0,
+        angle: 20,
         tailArr: [],
         tailIndex: 0,
         eyeArr: [],
@@ -261,7 +257,7 @@ game = {
         bodyIndex: 0,
 
         init: function() {
-            this.x = game.cWidth / 2 -50;
+            this.x = game.cWidth / 2 - 30;
             this.y = game.cHeight / 2;
             for (var i = 0 ; i < 8 ; i ++ ) {
                 this.tailArr[i] = new Image();
@@ -279,8 +275,10 @@ game = {
         draw: function() {
             var context = game.cxt1;
             // 大鱼坐标变换
-            this.x = lerpDistance(game.mx, this.x, 0.97);
-            this.y = lerpDistance(game.my, this.y, 0.97);
+            if(game.data.start) {
+                this.x = lerpDistance(game.mx, this.x, 0.97);
+                this.y = lerpDistance(game.my, this.y, 0.97);
+            }
             // 大鱼旋转变
             var deltaY = game.my - this.y;
             var deltaX = game.mx - this.x;
@@ -365,8 +363,10 @@ game = {
         draw: function() {
             var context = game.cxt1;
             // 小鱼坐标变换
-            this.x = lerpDistance(game.mom.x, this.x, 0.97);
-            this.y = lerpDistance(game.mom.y, this.y, 0.97);
+            if(game.data.start) {
+                this.x = lerpDistance(game.mom.x, this.x, 0.97);
+                this.y = lerpDistance(game.mom.y, this.y, 0.97);
+            }
 
             // 小鱼旋转变
             var deltaY = game.mom.y - this.y;
@@ -390,14 +390,12 @@ game = {
             }
             // 身体变色 添加gameover 判断
             this.bodyTimer += game.deltaTime * 0.6;
-            if(this.bodyTimer > 100) {
+            if(this.bodyTimer > 100 && !game.data.gameOver) {
                 this.bodyTimer = 0;
                 this.bodyIndex +=1;
                 if(this.bodyIndex > 19) {
                     this.bodyIndex = 19;
-                    game.data.gameOver = true;
-                    game.mx = game.cWidth / 2;
-                    game.my = game.cHeight / 2;
+                    game.data.gameOverfunc();
                 }
             }
 
@@ -560,13 +558,14 @@ game = {
          * @parmas {Number} fruitNum 吃到的果实数量 喂给小于后加分
          * @parmas {Number} double 判断是否是吃到了 绿色果实,吃到绿色后变成 2 （以后可以加判断 加分）
          * @parmas {Number} score 总分数
-         * @parmas {Boolean} gameOver 游戏是否结束
+         * @parmas {Boolean} gameOver 游戏是否结束 true
          * @params {Number} globalAlpha 透明度 
          */
         fruitNum: 0,
         double: 1,
         score: 0,
-        gameOver: false,
+        gameOver: true,
+        start: false,
         globalAlpha: 0,
         draw: function() {
             var x = game.cWidth / 2;
@@ -582,10 +581,12 @@ game = {
             context.shadowColor='#fff';
             context.globalAlpha = 1;
             context.fillText('score: ' + this.score, x, y - 30);
-            if(this.gameOver) {
-                this.globalAlpha += game.deltaTime * 0.0001;
+            if(this.gameOver && this.start) {
+                this.globalAlpha += game.deltaTime * 0.002;
                 if (this.globalAlpha > 1) {
                     this.globalAlpha = 1;
+                    var btngroup = document.getElementsByClassName('btngroup')[0];
+                    btngroup.style.display = 'block';
                 }
                 context.fillStyle='#f60';
                 context.font='40px sans-serif';
@@ -601,6 +602,47 @@ game = {
             this.double = 1;
             this.score += this.fruitNum * 100;
             this.fruitNum = 0;
+        },
+        startFuc: function() {
+            this.start = true;
+            this.gameOver = false;
+            this.score = 0;
+            this.fruitNum = 0;
+            game.baby.bodyIndex = 0;
+        },
+        gameOverfunc: function() {
+            this.gameOver = true;
+            game.baby.bodyIndex = 0;
+            game.mx = game.cWidth / 2;
+            game.my = game.cHeight / 2;
         }
     }
+},
+dom = {
+    startId: 'start',
+    introduce: 'introduce',
+    init: function() {
+        var startDom = document.getElementById(this.startId);
+        startDom.addEventListener('click',this.start,false);
+        var introduce = document.getElementById(this.introduce);
+        introduce.addEventListener('click',this.gameIntroduce,false);
+        var close1 = document.getElementsByClassName('close')[0]; 
+        close1.addEventListener('click',this.close,false);
+    },
+    start: function() {
+        var btngroup = document.getElementsByClassName('btngroup')[0];
+        btngroup.style.display = 'none';
+        game.data.startFuc();
+    },
+    gameIntroduce: function() {
+        var gameIntroduce = document.getElementsByClassName('gameIntroduce')[0];
+        gameIntroduce.style.display = 'block';
+    },
+    close: function(event) {
+        event.target.parentNode.parentNode.style.display = 'none';
+    }
+}
+window.onload = function() {
+    dom.init();
+    game.init();
 }
