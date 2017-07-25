@@ -35,6 +35,7 @@ var word = {
         this.context = canvas.getContext('2d');
         this.drawTable();
         this.eventFunc(canvas);
+        this.DomEvent();
     },
     /**
      * 画布添加事件
@@ -124,6 +125,20 @@ var word = {
             x: Math.round(eventX - box.left),
             y: Math.round(eventY - box.top)
         }
+    },
+    DomEvent: function() {
+        var that = this;
+        $("#clear_btn").click(function() {
+            that.clearCanvas();
+        });
+    },
+    /**
+     * 清除画布
+     */
+    clearCanvas: function() {
+        var context = this.context;
+        context.clearRect(0, 0, this.canvasWidth, this.canvasWidth);
+        this.drawTable();
     },
     // 画米字格
     drawTable: function() {

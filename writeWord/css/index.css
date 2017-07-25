@@ -6,3 +6,23 @@ canvas{
     margin: 20px auto;
     display: block;
 }
+.Controller{
+    overflow: hidden;
+    width: 800px;
+    margin: 20px auto;
+}
+.Controller .clearBox{
+    float: right;
+}
+.btn{
+    line-height: 40px;
+    font-size: 40px;
+    padding: 5px 10px;
+    border: 4px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #fff;
+}
+.btn:hover{
+    background-color: #eae2e2;
+}
