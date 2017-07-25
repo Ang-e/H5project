@@ -3,14 +3,14 @@ window.onload = function() {
 }
 var word = {
     /**
-     * @parmas {Number} canvasWidth canvas 画布的宽高
+     * @parmas {Number} canvasWidth canvas 画布的宽高 实现自适应
      * @parmas {String} canvasId canvas 画布的 id
      * @parmas context 画布的笔触 （自己的理解）
      * @parmas {Boolean} isMovesDown 鼠标是否按下 false
      * @parmas {Object} oldLoc 鼠标的老位置（画布）{x: 0, y: 0}
      * @parmas {Number} oldTime 时间戳 
      * @parmas {Number} lastLineWidth 最后一次笔的宽度 默认为 -1;
-     * @parmas {Number} maxLineWidth 最大笔触宽度 默认 30
+     * @parmas {Number} maxLineWidth 最大笔触宽度 默认 30 当小屏幕的时候根据屏幕宽度
      * @parmas {Number} minLineWidth 最小笔触宽度 默认 1
      * @parmas {Number} maxStrokeV 最大笔触速度 默认 30
      * @parmas {Number} minStrokeV 最小笔触速度 默认 0.1
@@ -23,7 +23,7 @@ var word = {
     oldLoc: {x: 0, y: 0},
     oldTime: 0,
     lastLineWidth: -1,
-    maxLineWidth: 30,
+    maxLineWidth: Math.min(800, $(window).width() - 20) * 0.0375,
     minLineWidth: 1,
     maxStrokeV: 10,
     minStrokeV: 0.1,
@@ -48,54 +48,86 @@ var word = {
         canvas.onmousedown = function(event) {
             event.preventDefault();
             // 每次按下更新老笔触
-            that.oldLoc = that.getCanvasXY(event.clientX, event.clientY, canvas);
-            that.oldTime = new Date().getTime();
-            that.isMouseDown = true;
+            that.startStroke(event.clientX, event.clientY);
         }
         canvas.onmouseup = function(event) {
             event.preventDefault();
-            that.isMouseDown = false;
+            that.endStroke();
         }
         canvas.onmouseout = function(event) {
             event.preventDefault();
-            that.isMouseDown = false;
+            that.endStroke();
         }
         canvas.onmousemove = function(event) {
             event.preventDefault();
             if(that.isMouseDown) {
-               // 获得上次的坐标 和这次的坐标进行绘制 
-               var curloc = that.getCanvasXY(event.clientX, event.clientY, canvas);
-               var oldLoc = that.oldLoc;
-               var curTime = new Date().getTime();
-               // 获得距离
-               var s = that.getDistance(curloc, oldLoc);
-               var t = curTime - that.oldTime;
-               var lineWidth = that.getLineWidth(t, s);
-               var context = that.context;
-               context.save();
-               context.beginPath();
-               context.moveTo(oldLoc.x, oldLoc.y);
-               context.lineTo(curloc.x, curloc.y);
-               context.lineWidth = lineWidth;
-               context.lineCap='round';
-               context.lineJoin='round';
-               context.strokeStyle = that.strokeColor;
-               context.stroke();
-               context.restore();
-               that.oldLoc = curloc;
-               that.oldTime = curTime;
+               that.moveStroke(event.clientX, event.clientY);
             }
         }
+        // 手机端
+        canvas.addEventListener('touchstart',function(event) {
+            event.preventDefault();
+            // 手机触控有多触控获得第一个即可
+            var touch = event.touches[0];
+            that.startStroke(touch.pageX, touch.pageY - $(document).scrollTop());   
+        },false)
+        canvas.addEventListener('touchend',function(event) {
+            event.preventDefault();
+            that.endStroke();
+        },false)
+        canvas.addEventListener('touchmove',function(event) {
+            event.preventDefault();
+            var touch = event.touches[0];
+            // 手机端减去滚动的高度
+            that.moveStroke(touch.pageX, touch.pageY -  $(document).scrollTop());
+        },false)
     },
+    startStroke(x, y) {
+        this.oldLoc = this.getCanvasXY(x, y);
+        this.oldTime = new Date().getTime();
+        this.isMouseDown = true;
+    },
+    endStroke() {
+        this.isMouseDown = false;
+    },
+    moveStroke(x, y) {
+        // 获得上次的坐标 和这次的坐标进行绘制 
+        var curloc = this.getCanvasXY(x, y);
+        var oldLoc = this.oldLoc;
+        var curTime = new Date().getTime();
+        // 获得距离、时间
+        var s = this.getDistance(curloc, oldLoc);
+        var t = curTime - this.oldTime;
+        // 获得线条宽度
+        var lineWidth = this.getLineWidth(t, s);
+        var context = this.context;
+        context.save();
+        context.beginPath();
+        context.moveTo(oldLoc.x, oldLoc.y);
+        context.lineTo(curloc.x, curloc.y);
+        context.lineWidth = lineWidth;
+        context.lineCap='round';
+        context.lineJoin='round';
+        context.strokeStyle = this.strokeColor;
+        context.stroke();
+        context.restore();
+        this.oldLoc = curloc;
+        this.oldTime = curTime;
+    },
+    /**
+     * 获得线条的宽度，根据速度 速度越大宽度越小
+     * @param {any} t 
+     * @param {any} s 
+     * @returns 
+     */
     getLineWidth: function(t, s) {
         var v = s / t ;
-        // 速度越大, 宽度越小
         var resultWidth;
         var maxLineWidth = this.maxLineWidth;
         var minLineWidth = this.minLineWidth;
         var maxStrokeV = this.maxStrokeV;
         var minStrokeV = this.minStrokeV;
-        if (v <= 0.1) {
+        if (v <= minStrokeV) {
             resultWidth = maxLineWidth;
         } else if (v >= maxStrokeV) {
             resultWidth = minLineWidth;
@@ -122,7 +154,8 @@ var word = {
      * @param {Dom} canvas 
      * @returns {Object} { x , y } 坐标
      */
-    getCanvasXY: function(eventX, eventY, canvas) {
+    getCanvasXY: function(eventX, eventY) {
+        var canvas = document.getElementById(this.canvasId);
         var box = canvas.getBoundingClientRect();
         return {
             x: Math.round(eventX - box.left),
