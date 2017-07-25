@@ -47,19 +47,25 @@ var word = {
         canvas.onmousemove = function(event) {
             event.preventDefault();
             if(that.isMouseDown) {
+               // 获得上次的坐标 和这次的坐标进行绘制 
                var curloc = that.getCanvasXY(event.clientX, event.clientY, canvas);
-               var context = that.context;
                var oldLoc = that.oldLoc;
+               var context = that.context;
+               context.save();
                context.beginPath();
                context.moveTo(oldLoc.x, oldLoc.y);
                context.lineTo(curloc.x, curloc.y);
+               context.lineWidth = 30;
+               context.lineCap='round';
+               context.lineJoin='round';
                context.stroke();
+               context.restore();
                that.oldLoc = curloc;
             }
         }
     },
     /**
-     * 获得鼠标在画布的坐标
+     * 获得鼠标在画布的坐标 画布坐标系换算
      * @param {Number} eventX 相对于浏览器左上点的坐标 
      * @param {Number} eventY  
      * @param {Dom} canvas 
