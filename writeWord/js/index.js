@@ -14,8 +14,9 @@ var word = {
      * @parmas {Number} minLineWidth 最小笔触宽度 默认 1
      * @parmas {Number} maxStrokeV 最大笔触速度 默认 30
      * @parmas {Number} minStrokeV 最小笔触速度 默认 0.1
+     * @parmas {String} strokeColor 笔触颜色 默认颜色为 black
      */
-    canvasWidth: 800,
+    canvasWidth: Math.min(800, $(window).width() - 20),
     canvasId: 'canvas',
     context: '',
     isMouseDown: false,
@@ -26,6 +27,7 @@ var word = {
     minLineWidth: 1,
     maxStrokeV: 10,
     minStrokeV: 0.1,
+    strokeColor: 'black',
     /**
      * 初始化 找到画布元素设置宽高
      */
@@ -77,6 +79,7 @@ var word = {
                context.lineWidth = lineWidth;
                context.lineCap='round';
                context.lineJoin='round';
+               context.strokeStyle = that.strokeColor;
                context.stroke();
                context.restore();
                that.oldLoc = curloc;
@@ -130,6 +133,11 @@ var word = {
         var that = this;
         $("#clear_btn").click(function() {
             that.clearCanvas();
+        });
+        $(".controllBox .controll").click(function() {
+            var $this = $(this);
+            $this.addClass('active').siblings().removeClass('active');
+            that.strokeColor = $this.css('backgroundColor');
         });
     },
     /**

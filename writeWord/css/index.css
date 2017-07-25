@@ -8,7 +8,8 @@ canvas{
 }
 .Controller{
     overflow: hidden;
-    width: 800px;
+    width: calc(100% - 20px);
+    max-width: 800px;
     margin: 20px auto;
 }
 .Controller .clearBox{
@@ -25,4 +26,39 @@ canvas{
 }
 .btn:hover{
     background-color: #eae2e2;
+}
+.controllBox{
+    float: left;
+}
+.controll{
+    width:40px;
+    height: 40px;
+    margin-right: 10px;
+    border: 5px solid #fff;
+    display: inline-block;
+    cursor: pointer;
+}
+.controll.active{
+    border-color: #c573c5;
+}
+.controll:hover{
+    border-color: #c573c5;
+}
+.black_controll{
+    background-color: black;
+}
+.blue_controll{
+    background-color: blue;
+}
+.red_controll{
+    background-color: red;
+}
+.orange_controll{
+    background-color: orange;
+}
+.pink_controll{
+    background-color: pink;
+}
+.purple_controll{
+    background-color: purple;
 }
