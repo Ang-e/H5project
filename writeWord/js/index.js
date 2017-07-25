@@ -8,12 +8,24 @@ var word = {
      * @parmas context 画布的笔触 （自己的理解）
      * @parmas {Boolean} isMovesDown 鼠标是否按下 false
      * @parmas {Object} oldLoc 鼠标的老位置（画布）{x: 0, y: 0}
+     * @parmas {Number} oldTime 时间戳 
+     * @parmas {Number} lastLineWidth 最后一次笔的宽度 默认为 -1;
+     * @parmas {Number} maxLineWidth 最大笔触宽度 默认 30
+     * @parmas {Number} minLineWidth 最小笔触宽度 默认 1
+     * @parmas {Number} maxStrokeV 最大笔触速度 默认 30
+     * @parmas {Number} minStrokeV 最小笔触速度 默认 0.1
      */
     canvasWidth: 800,
     canvasId: 'canvas',
     context: '',
     isMouseDown: false,
     oldLoc: {x: 0, y: 0},
+    oldTime: 0,
+    lastLineWidth: -1,
+    maxLineWidth: 30,
+    minLineWidth: 1,
+    maxStrokeV: 10,
+    minStrokeV: 0.1,
     /**
      * 初始化 找到画布元素设置宽高
      */
@@ -34,6 +46,7 @@ var word = {
             event.preventDefault();
             // 每次按下更新老笔触
             that.oldLoc = that.getCanvasXY(event.clientX, event.clientY, canvas);
+            that.oldTime = new Date().getTime();
             that.isMouseDown = true;
         }
         canvas.onmouseup = function(event) {
@@ -50,19 +63,53 @@ var word = {
                // 获得上次的坐标 和这次的坐标进行绘制 
                var curloc = that.getCanvasXY(event.clientX, event.clientY, canvas);
                var oldLoc = that.oldLoc;
+               var curTime = new Date().getTime();
+               // 获得距离
+               var s = that.getDistance(curloc, oldLoc);
+               var t = curTime - that.oldTime;
+               var lineWidth = that.getLineWidth(t, s);
                var context = that.context;
                context.save();
                context.beginPath();
                context.moveTo(oldLoc.x, oldLoc.y);
                context.lineTo(curloc.x, curloc.y);
-               context.lineWidth = 30;
+               context.lineWidth = lineWidth;
                context.lineCap='round';
                context.lineJoin='round';
                context.stroke();
                context.restore();
                that.oldLoc = curloc;
+               that.oldTime = curTime;
             }
         }
+    },
+    getLineWidth: function(t, s) {
+        var v = s / t ;
+        // 速度越大, 宽度越小
+        var resultWidth;
+        var maxLineWidth = this.maxLineWidth;
+        var minLineWidth = this.minLineWidth;
+        var maxStrokeV = this.maxStrokeV;
+        var minStrokeV = this.minStrokeV;
+        if (v <= 0.1) {
+            resultWidth = maxLineWidth;
+        } else if (v >= maxStrokeV) {
+            resultWidth = minLineWidth;
+        } else {
+            resultWidth = maxLineWidth - (v - minStrokeV) / (maxStrokeV - minStrokeV) * (maxLineWidth - minLineWidth);
+        }
+        // 根据上次的宽度平滑过渡
+        this.lastLineWidth = this.lastLineWidth * 2 / 3 + resultWidth * 1 / 3;
+        return this.lastLineWidth;
+    },
+    /**
+     * 获得距离
+     * @param {object} 当前位置信息 
+     * @param {object} 老的位置信息 
+     * @returns Number
+     */
+    getDistance: function(curloc, oldLoc) {
+        return Math.sqrt((curloc.x - oldLoc.x) * (curloc.x - oldLoc.x) + (curloc.y - oldLoc.y) * (curloc.y - oldLoc.y))
     },
     /**
      * 获得鼠标在画布的坐标 画布坐标系换算
