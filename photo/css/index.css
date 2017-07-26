@@ -6,5 +6,49 @@
     display: block;
     width: 800px;
     height: 600px;
+    filter: blur(10px);
+    -webkit-filter: blur(10px);
+    -o-filter: blur(10px);
+    -ms-filter: blur(10px);
+    -moz-filter: blur(10px);
+}
+.box{
+    width: 800px;
+    position: relative;
+    margin:  0 auto;
+    overflow: hidden;
     margin: 20px auto;
+}
+canvas{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+.btn{
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 20px;
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+    cursor: pointer;
+}
+.btn.reset{
+    left: 200px;
+    bottom: 50px;
+    background-color: #1c2265;
+}
+.btn.reset:hover{
+    background-color: #070e5f;
+}
+.btn.show{
+    right: 200px;
+    bottom: 50px;
+    background-color: green;
+}
+.btn.show:hover{
+    background-color: #0c4e0c;
 }
