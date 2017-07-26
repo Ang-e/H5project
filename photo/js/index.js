@@ -12,8 +12,8 @@ photo = {
      */
     canvasId: 'canvas',
     context: '',
-    canvasWidth: 800,
-    canvasHeight: 600,
+    canvasWidth: Math.min(window.innerWidth , 800),
+    canvasHeight: 0,
     image: new Image(),
     clippingRegin: {x : 0, y: 0, r: 0},
     /**
@@ -21,18 +21,18 @@ photo = {
      */
     init: function() {
         var canvas = document.getElementById(this.canvasId);
-        canvas.width = this.canvasWidth;
-        canvas.height = this.canvasHeight;
         this.context = canvas.getContext('2d');
         this.image.src = './image/05.jpg';
-        var r = this.canvasWidth / 16;
-        this.clippingRegin = {
-            x: Math.random() * (this.canvasWidth - 2 * r) + r,
-            y: Math.random() * (this.canvasHeight - 2 * r) + r,
-            r: r
-        }
         var that = this;
         this.image.onload = function() {
+            var r = that.canvasWidth / 16;
+            canvas.width = that.canvasWidth;
+            canvas.height = that.canvasHeight = document.getElementById('image').offsetHeight;
+            that.clippingRegin = {
+                x: Math.random() * (that.canvasWidth - 2 * r) + r,
+                y: Math.random() * (that.canvasHeight - 2 * r) + r,
+                r: r
+            }
             that.draw();
         }
     },
@@ -82,13 +82,24 @@ photo = {
      */
     domEvent: function() {
         var that = this;
-        $(".reset").click(function() {
-            clearInterval(that.timer);
-            that.init();
-        });
-        $(".show").click(function() {
-            clearInterval(that.timer);
-            that.show();
-        });
+        if(this.canvasWidth >= 800) {
+            $(".reset").on('click',function() {
+                clearInterval(that.timer);
+                that.init();
+            });
+            $(".show").on('click',function() {
+                clearInterval(that.timer);
+                that.show();
+            });
+        } else {
+            $(".reset").on('touchstart',function() {
+                clearInterval(that.timer);
+                that.init();
+            });
+            $(".show").on('touchstart',function() {
+                clearInterval(that.timer);
+                that.show();
+            });
+        }
     }
 }
