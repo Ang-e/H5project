@@ -29,6 +29,7 @@ clock = {
         }, 1000);
         that.getTime();
     },
+    // 获得时间
     getTime: function() {
         var date = new Date();
         var second = date.getSeconds();
@@ -40,7 +41,8 @@ clock = {
         this.drawMinute(minutes)
         this.drawSecond(second)
         this.drawDot();
-    },  
+    },
+    // 绘制分针时针秒针的固定点  
     drawDot: function() {
         var context = this.context;
         var circleR = this.circleR;
@@ -61,7 +63,7 @@ clock = {
         var clockWidth = this.clockWidth;
         context.save();
         context.translate(clockWidth / 2, clockWidth / 2);
-        // 2 * Math.PI / 360 是一度的弧度 每分针旋转 6°
+        // 2 * Math.PI / 360 是一度的弧度 每分针旋转 6° 是一个尖头的形状
         context.rotate( 2 * Math.PI / 360 * second * 6);
         context.moveTo(clockWidth / 100, clockWidth / 10);
         context.lineTo(clockWidth / 200, - circleR + clockWidth / 9);
@@ -114,14 +116,14 @@ clock = {
         context.beginPath();
         context.translate(clockWidth / 2, clockWidth / 2);
         context.lineWidth= this.circleLineWidth;
-        context.lineCap='round';
-        context.lineJoin='round';
         context.arc(0, 0, circleR, 2 * Math.PI, false);
-        context.strokeStyle = this.circleColor;
+        context.strokeStyle = this.circleColor;        
         context.closePath();
         context.stroke();
-        
+        context.restore();
         // 表盘数字
+        context.save();
+        context.translate(clockWidth / 2, clockWidth / 2);
         context.font= clockWidth / 10 + "px sans-serif";
         context.textAlign='center';
         context.textBaseline='middle';
