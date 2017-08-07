@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas 相关</title>
+    <style>
+        *{
+            padding: 0px;
+            margin: 0px;
+        }
+        canvas{
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <canvas height="170" width="170" id="canvas1">
+        你的浏览器不支持 canvas
+    </canvas>
+    <canvas height="170" width="170" id="canvas2">
+        你的浏览器不支持 canvas
+    </canvas>
+    <canvas height="170" width="170" id="canvas3">
+        你的浏览器不支持 canvas
+    </canvas>
+    <canvas height="170" width="170" id="canvas4">
+        你的浏览器不支持 canvas
+    </canvas>
+    <canvas height="170" width="170" id="canvas5">
+        你的浏览器不支持 canvas
+    </canvas>
+    <canvas height="170" width="170" id="canvas6">
+        你的浏览器不支持 canvas
+    </canvas>
+    <canvas height="170" width="170" id="canvas7">
+        你的浏览器不支持 使用虚线
+    </canvas>
+    <canvas height="170" width="170" id="canvas8">
+        你的浏览器不支持 使用虚线
+    </canvas>
+    <script>
+        window.onload = function () {
+            var canvas1 = document.getElementById('canvas1');
+            var context1 = canvas1.getContext('2d');
+            // 绘制对话框
+            function drawDialog() {
+                // 圆角为25的
+                context1.beginPath();
+                context1.moveTo(50, 25);
+                context1.quadraticCurveTo(25, 25, 25, 50);
+                context1.lineTo(25, 75);
+                context1.quadraticCurveTo(25, 100, 60, 100);
+                context1.quadraticCurveTo(60, 120, 40, 130);
+                context1.quadraticCurveTo(80, 120, 80, 100);
+                context1.lineTo(125, 100);
+                context1.quadraticCurveTo(145, 100, 145, 75);
+                context1.lineTo(145,50);
+                context1.quadraticCurveTo(145, 25, 120, 25);
+                context1.closePath();
+                context1.lineJoin='round';
+                context1.stroke();
+            }
+            var canvas2 = document.getElementById('canvas2');
+            var context2 = canvas2.getContext('2d');
+            // 画心
+            function drawHreat() {
+                context2.beginPath();
+                context2.moveTo(85,150);
+                context2.bezierCurveTo(167, 105, 167, 5, 85,50);
+                context2.moveTo(85,150);
+                context2.bezierCurveTo(3, 105, 3, 5, 85, 50);
+                context2.stroke();
+            }
+            var canvas3 = document.getElementById('canvas3');
+            var context3 = canvas3.getContext('2d');
+            // fillstyle 实例
+            function fillStyle() {
+                context3.beginPath();
+                context3.translate(10, 10);
+                for (var j = 0; j < 6; j++) {
+                   for (var i = 0; i < 6; i++) {
+                    context3.fillStyle = "rgb(" + Math.floor(255 - 42.5 * j) + "," +  Math.floor(255 - 42.5 * i) + ",0)";
+                    context3.fillRect(j * 25, i * 25, 25, 25);
+                   }
+                }
+                context3.closePath();
+            }
+            var canvas4 = document.getElementById('canvas4');
+            var context4 = canvas4.getContext('2d');
+            // strokeStyle
+            function strokeStyle() {
+                context4.translate(10, 10);
+                for (var j = 0; j < 6; j++) {
+                   for (var i = 0; i < 6; i++) {
+                    context4.strokeStyle = "rgb(" + Math.floor(255 - 42.5 * j) + "," +  Math.floor(255 - 42.5 * i) + ",0)";
+                    context4.beginPath();
+                    context4.arc(12.5 + j * 25, 12.5 + i * 25, 10, 0, 2 * Math.PI, true);
+                    context4.stroke();
+                   }
+                }
+            }
+            var canvas5 = document.getElementById('canvas5');
+            var context5 = canvas5.getContext('2d');
+            // globalAlpha
+            function globalAlpha() {
+                context5.translate(10, 10);
+                context5.fillStyle = '#FD0';
+                context5.fillRect(0,0,75,75);
+                context5.fillStyle = '#6C0';
+                context5.fillRect(75,0,75,75);
+                context5.fillStyle = '#09F';
+                context5.fillRect(0,75,75,75);
+                context5.fillStyle = '#F30';
+                context5.fillRect(75,75,75,75);
+                context5.fillStyle = '#FFF';
+                context5.globalAlpha= 0.2;
+                for (var i = 0; i < 7; i++) {
+                    context5.beginPath();
+                    context5.arc(75, 75, 10 + 10 * i, 0, Math.PI * 2, true);
+                    context5.fill();
+                }
+            }
+            var canvas6 = document.getElementById('canvas6');
+            var context6 = canvas6.getContext('2d');
+            // rgba
+            function rgba(){
+                context6.translate(10, 10);
+                context6.fillStyle = 'rgb(255,221,0)';
+                context6.fillRect(0,0,150,37.5);
+                context6.fillStyle = 'rgb(102,204,0)';
+                context6.fillRect(0,37.5,150,37.5);
+                context6.fillStyle = 'rgb(0,153,255)';
+                context6.fillRect(0,75,150,37.5);
+                context6.fillStyle = 'rgb(255,51,0)';
+                context6.fillRect(0,112.5,150,37.5);
+                for (var i = 0; i < 10; i++) {
+                    context6.fillStyle = 'rgba(255, 255, 255,' + (1 + i) / 10 + ')';
+                    for (var j = 0; j < 4; j++) {
+                        context6.fillRect(5 + 14 * i , 5 + j * 37.5 , 14, 27.5);     
+                    }
+                }
+            }
+
+            // 虚线 (跑马灯)
+            lineDash = {
+                canvas: document.getElementById('canvas7'),
+                ctx: document.getElementById('canvas7').getContext('2d'),
+                offset: 0,
+                draw: function() {
+                    var context = this.ctx;
+                    var canvas = this.canvas;
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.setLineDash([4, 1]);
+                    context.lineDashOffset = -this.offset;
+                    context.strokeRect(10, 10, 100, 100);
+                },
+                march: function() {
+                    this.offset ++;
+                    if(this.offset > 16) {
+                        this.offset = 0;
+                    }
+                    this.draw();
+                }
+            }
+            lineDash.march();
+            setInterval(function(){
+                lineDash.march();
+            }, 20);
+            // 径向渐变
+            linearGradient =  {
+                canvas: document.getElementById('canvas8'),
+                draw: function() {
+                    var context = this.canvas.getContext('2d');
+                    var lineargradient = context.createLinearGradient(0, 0, 0, 150);
+                    lineargradient.addColorStop(0, 'blue');
+                    lineargradient.addColorStop(0.5, '#fff');
+                    lineargradient.addColorStop(0.5, 'green');
+                    lineargradient.addColorStop(1, '#fff');
+                    var lineargradient2 = context.createLinearGradient(0, 50, 0, 95);
+                    lineargradient2.addColorStop(0, '#000');
+                    lineargradient2.addColorStop(0.5, '#000');
+                    lineargradient2.addColorStop(1, 'rgba(0,0,0,0)');
+                    context.strokeStyle = lineargradient2;
+                    context.fillStyle = lineargradient;
+                    context.fillRect(10,10,150,150);
+                    context.strokeRect(60, 50, 50, 50);
+                }
+            };
+            linearGradient.draw();
+            rgba();
+            globalAlpha();
+            strokeStyle();
+            fillStyle();
+            drawDialog();
+            drawHreat();
+        }
+    </script>
+</body>
+</html>

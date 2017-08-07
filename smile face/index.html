@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>smile face</title>
+    <style>
+        *{
+            padding: 0px;
+            margin: 0px;
+        }
+        canvas{
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" height="170" width="170">
+        你的浏览器不支持 canvas 
+    </canvas>
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+            function drawSmile() {
+                // 注：如果不使用 beginPath 就要移动笔触让两个圆之间没有连线
+                // 画脸蛋
+                context.beginPath();
+                context.arc(85, 85, 65, 0, 2 * Math.PI, true);
+                context.stroke();
+                // 嘴角
+                context.beginPath();
+                context.arc(85, 85, 45, 0, 1 * Math.PI, false);
+                context.stroke();
+                // 左眼
+                context.beginPath();
+                context.arc(60, 65, 5, 0, 2 * Math.PI, true);
+                context.stroke();
+                // 右眼
+                context.beginPath();
+                context.arc(110, 65, 5, 0, 2 * Math.PI, true);
+                context.stroke();
+            }
+            drawSmile();
+        }
+    </script>
+</body>
+</html>
