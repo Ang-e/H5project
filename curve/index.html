@@ -52,6 +52,9 @@
     <canvas height="170" width="170" id="canvas11">
         你的浏览器不支持 使用虚线
     </canvas>
+    <canvas height="170" width="170" id="canvas12">
+        你的浏览器不支持 使用虚线
+    </canvas>
     <script>
         window.onload = function () {
             var canvas1 = document.getElementById('canvas1');
@@ -264,6 +267,19 @@
                 }
             };
             shadow.draw();
+
+            // 填充规则
+            var fill = {
+                canvas: document.getElementById('canvas12'),
+                draw: function(){
+                    var context = this.canvas.getContext('2d');
+                    context.beginPath();
+                    context.arc(85, 85, 30, 0, Math.PI * 2, true);
+                    context.arc(85, 85, 45, 0, Math.PI * 2, true);
+                    context.fill('evenodd');
+                }
+            }
+            fill.draw();
             rgba();
             globalAlpha();
             strokeStyle();
