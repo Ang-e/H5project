@@ -61,6 +61,9 @@
     <canvas height="170" width="170" id="canvas14">
         你的浏览器不支持 使用虚线
     </canvas>
+    <canvas height="170" width="170" id="canvas15">
+        你的浏览器不支持 使用虚线
+    </canvas>
     <script>
         window.onload = function () {
             var canvas1 = document.getElementById('canvas1');
@@ -303,7 +306,7 @@
             // 图像 切片
             var slicing = {
                 canvas: document.getElementById('canvas14'),
-                draw: function() {
+                draw: function(){
                     var canvas = this.canvas;
                     var context = canvas.getContext('2d');
                     var img = new Image();
@@ -314,7 +317,25 @@
                 }
             };
             slicing.draw();
-
+            // rotate 旋转
+            var rotate = {
+                canvas: document.getElementById('canvas15'),
+                draw: function(){
+                    var context = this.canvas.getContext('2d');
+                    context.translate(85, 85);
+                    for (var i = 1; i < 6; i ++) {
+                        context.fillStyle='rgb('+ 51 * i + ',' + (255 - 51 * i) + ',255)';
+                        for (var j = 0; j < i * 6; j++) {
+                            // Math.PI * 2 是一个圆的弧度 （意思是把这个圆分成多少分）
+                            context.rotate(Math.PI * 2 / ( i * 6));
+                            context.beginPath();
+                            context.arc(0, i * 12.5, 5, 0, Math.PI * 2, true);
+                            context.fill();
+                        }
+                    }
+                }
+            }
+            rotate.draw();
             rgba();
             globalAlpha();
             strokeStyle();
