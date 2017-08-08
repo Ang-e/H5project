@@ -55,6 +55,9 @@
     <canvas height="170" width="170" id="canvas12">
         你的浏览器不支持 使用虚线
     </canvas>
+    <canvas height="170" width="170" id="canvas13">
+        你的浏览器不支持 使用虚线
+    </canvas>
     <script>
         window.onload = function () {
             var canvas1 = document.getElementById('canvas1');
@@ -280,6 +283,18 @@
                 }
             }
             fill.draw();
+            // measureText() 文本测量
+            var measureText = {
+                canvas: document.getElementById('canvas13'),
+                draw: function(){
+                    var context = this.canvas.getContext('2d');
+                    var textName = 'xiaocheng2';
+                    var text = context.measureText(textName);
+                    context.strokeText(textName, 20, 20, text.width);
+                    console.log(text.width);
+                }
+            }
+            measureText.draw();
             rgba();
             globalAlpha();
             strokeStyle();
